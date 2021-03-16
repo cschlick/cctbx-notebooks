@@ -1,0 +1,5 @@
+name: cctbx-notebooks
+channels:
+- conda-forge
+dependencies:
+- cctbx-project
