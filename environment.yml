@@ -2,4 +2,4 @@ name: cctbx-notebooks
 channels:
 - conda-forge
 dependencies:
-- cctbx_project
+- cctbx
