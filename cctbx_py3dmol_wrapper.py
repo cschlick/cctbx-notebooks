@@ -109,7 +109,7 @@ class CCTBX3dmolWrapper:
           print("Used volume cache:",True)
       else:
         data = mm.map_data().as_numpy_array()
-        meta = mm_to_meta(mm)
+        meta = self.mm_to_meta(mm)
         cubestring = write_cube_string(data,meta)
         if debug:
           print("Used volume cache:",False)
@@ -147,3 +147,30 @@ class CCTBX3dmolWrapper:
       
     view.zoomTo()
     return view
+  
+  
+    @staticmethod
+    def mm_to_meta(map_manager):
+      """
+      Form metadata dictionary from map manager object
+
+      mm: map_manager objects
+
+      returns: meta (dict)
+      """
+      conversion = 1.8897259885789233 # bohr to angstrom
+      scale = conversion
+      ax,ay,az = map_manager.pixel_sizes()
+      ax*=scale
+      ay*=scale
+      az*=scale
+      xvec = (ax,0.0,0.0)
+      yvec = (0.0,ay,0.0)
+      zvec = (0.0,0.0,az)
+      origin = tuple(map_manager.get_origin())
+      meta = {"atoms":[],
+              "org":origin,
+              "xvec":xvec,
+              "yvec":yvec,
+              "zvec":zvec}
+      return meta
