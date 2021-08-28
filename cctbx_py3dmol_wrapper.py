@@ -86,9 +86,9 @@ class CCTBX3dmolWrapper:
         models.append(obj)
       else:
         print("ERROR: Only high level CCTBX map/model objects are supported by this function")
-        objs = [model_manager,map_manager,map_model_manager]
-        for obj in objs:
-          print("\n",obj.__class__)
+#         objs = [model_manager,map_manager,map_model_manager]
+#         for obj in objs:
+#           print("\n",obj.__class__)
         return None
 
     view = py3Dmol.view(js='https://3dmol.org/build/3Dmol.js',)
