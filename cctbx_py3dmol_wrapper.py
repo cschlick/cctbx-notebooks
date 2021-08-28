@@ -1,7 +1,7 @@
 from mmtbx.model.model import manager as model_manager
 from iotbx.map_manager import map_manager
 from iotbx.map_model_manager import map_model_manager
-from cubestring import *
+from cubetools import *
 
 import py3Dmol
 import numpy as np
