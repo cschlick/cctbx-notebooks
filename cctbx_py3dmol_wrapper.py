@@ -6,8 +6,6 @@ from cubetools import *
 import py3Dmol
 import numpy as np
 import io
-
-
 class CCTBX3dmolWrapper:
   """"
   A wrapper around the py3Dmol package written to 
@@ -35,12 +33,13 @@ class CCTBX3dmolWrapper:
               style=None,
               ribbon_color="red",
               sidechain_color=f"WhiteCarbon",
+              model_shift = None,
               map_color="#808080",
               opacity=0.6,
               map_threshold=0.1,
               map_apix=None,
               map_scale=1.0,
-              map_shift=(0.0,0.0,0.0),
+              shift_back=False,
               debug=False):
     """
     The main function to show objects. Objects should be of type:
@@ -63,15 +62,13 @@ class CCTBX3dmolWrapper:
 
     ribbon_color (str): The color of the ribbons
     sidechain_color (str): The color of the sidechains
+    model_shift (tuple): Modify the model coords by (x,y,z)
     map_color (str): The color of the density map
     opacity (float): The opacity of the density map
     map_threshold (float): The density threshold
     map_apix (float): Angstroms per pixel. If None, taken from map_manager
     map_scale (float): modify map_apix by a scaler value
-    map_shift (tuple): shift the map around
-
-
-
+    shift_back (bool): whether to revert any accumulated shifts
     """
     # collect all objects and sort as maps or models
     maps = []
@@ -126,8 +123,15 @@ class CCTBX3dmolWrapper:
       view.addVolumetricData(map_string, "cube", {'isoval': map_threshold, 'color':map_color , 'opacity': opacity})
     
     ############# Models #############
+
     for m in models:
-      view.addModel(m.model_as_pdb(),'pdb')
+      if model_shift is not None:
+        sites_cart_np = m.get_sites_cart().as_numpy_array()
+        sites_cart_np+=np.array(model_shift)
+        m.set_sites_cart(flex.vec3_double(sites_cart_np))
+
+    for m in models:
+      view.addModel(m.model_as_pdb(do_not_shift_back=not shift_back),'pdb')
     
     if style is not None:
        
@@ -152,7 +156,7 @@ class CCTBX3dmolWrapper:
   
 
   @staticmethod
-  def mm_to_meta(map_manager):
+  def mm_to_meta(map_manager,scale=1.0):
     """
     Form metadata dictionary from map manager object
 
@@ -161,7 +165,7 @@ class CCTBX3dmolWrapper:
     returns: meta (dict)
     """
     conversion = 1.8897259885789233 # bohr to angstrom
-    scale = conversion
+    scale*= conversion
     ax,ay,az = map_manager.pixel_sizes()
     ax*=scale
     ay*=scale
